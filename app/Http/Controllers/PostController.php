@@ -15,7 +15,10 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        // create a variable and store 
+
+        $posts = Post::all();
+        return view('posts.index')->withPosts($posts);
     }
 
     /**
@@ -50,7 +53,7 @@ class PostController extends Controller
         // redirect to another page.
 
               Session::flash('success', 'The blog post was sucessfully saved!');
-            return redirect()->route('posts.show',$post->id);
+              return redirect()->route('posts.show',$post->id);
 
     }
 
@@ -62,8 +65,9 @@ class PostController extends Controller
      */
     public function show($id)
     {
+        $post = Post::find($id);
         //
-        return view('posts.show');
+        return view('posts.show')->withPost($post);
     }
 
     /**
@@ -75,6 +79,10 @@ class PostController extends Controller
     public function edit($id)
     {
         //
+        $post =Post::find($id);
+
+        return view('posts.edit')->withPost($post);
+        
     }
 
     /**
@@ -86,7 +94,22 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        //Validate the data
+        $this -> validate($request, array(
+            'title' => 'required|max:100',
+            'body' => 'required'
+          ));
+        //Save the data to database
+             $post =Post::find($id);
+
+             $post->title = $request->input('title');
+             $post->body =$request->input('body');
+
+             $post->save();
+
+             $request->session()->flash('success', 'This post was successfully saved.');
+        return redirect()->route('posts.show', $post);
+
     }
 
     /**
@@ -98,5 +121,11 @@ class PostController extends Controller
     public function destroy($id)
     {
         //
+        $post = Post::find($id);
+        $post->delete();
+
+        Session::flash('success', 'The post was deleted successfully.');
+        return redirect()->route('posts.index');
+
     }
 }
