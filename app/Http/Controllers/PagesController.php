@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Post;
+
 class PagesController extends Controller {
    
  public function getIndex(){
-       return view('pages.welcome');
+     $posts =Post::latest('created_at', 'desc')->limit(4)->get();
+       return view('pages.welcome')->withPosts($posts);
     }
     
 public function getAbout(){
